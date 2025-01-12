@@ -1,0 +1,49 @@
+name: Deploy Cloud Functions
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'server/functions/**'
+
+jobs:
+  deploy:
+    name: Deploy
+    runs-on: ubuntu-22.04
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - uses: pnpm/action-setup@v3
+        with:
+          version: 8
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'pnpm'
+          cache-dependency-path: 'server/functions/pnpm-lock.yaml'
+
+      - name: Install Firebase CLI
+        run: pnpm add -g firebase-tools
+
+      - name: Install dependencies
+        working-directory: server/functions
+        run: pnpm install --prod
+
+      - name: Build
+        working-directory: server/functions
+        run: pnpm build
+
+      - name: Setup Google Cloud Auth
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.GCP_SA_KEY }}
+
+      - name: Deploy to Firebase
+        working-directory: server/functions
+        run: firebase deploy --only functions --token ${{ secrets.FIREBASE_TOKEN }}
+        env:
+          FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
+          PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}

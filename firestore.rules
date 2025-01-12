@@ -1,0 +1,23 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // テストデータのルール
+    match /tests/{testId} {
+      allow read: if request.auth != null && resource.data.userId == request.auth.uid;
+      allow write: if request.auth != null && request.resource.data.userId == request.auth.uid;
+    }
+    
+    // 分析結果のルール
+    match /analysis/{analysisId} {
+      allow read: if request.auth != null && resource.data.userId == request.auth.uid;
+      // 書き込みはCloud Functionsからのみ許可
+      allow write: if false;
+    }
+    
+    // ユーザープロファイルのルール
+    match /users/{userId} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+    }
+  }
+}

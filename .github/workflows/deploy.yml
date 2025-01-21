@@ -14,66 +14,41 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      # Flutterのインストール（Dart 3.2.6と互換性のあるバージョン）
-      - name: Install Flutter
-        uses: subosito/flutter-action@v2
+      # Flutterのインストール
+      - uses: subosito/flutter-action@v2
         with:
           flutter-version: '3.13.9'
           channel: 'stable'
-          cache: true
 
-      # Flutterの依存関係をキャッシュ
-      - name: Cache Flutter dependencies
-        uses: actions/cache@v3
-        with:
-          path: ${{ env.PUB_CACHE }}
-          key: ${{ runner.os }}-pub-${{ hashFiles('**/pubspec.lock') }}
-          restore-keys: ${{ runner.os }}-pub-
-
-      # 環境変数ファイルの作成
-      - name: Create .env file
-        run: |
-          cd client
-          touch .env
-          echo "FIREBASE_API_KEY=${{ secrets.FIREBASE_API_KEY }}" >> .env
-          echo "FIREBASE_AUTH_DOMAIN=${{ secrets.FIREBASE_AUTH_DOMAIN }}" >> .env
-          echo "FIREBASE_PROJECT_ID=${{ secrets.FIREBASE_PROJECT_ID }}" >> .env
-          echo "FIREBASE_STORAGE_BUCKET=${{ secrets.FIREBASE_STORAGE_BUCKET }}" >> .env
-          echo "FIREBASE_MESSAGING_SENDER_ID=${{ secrets.FIREBASE_MESSAGING_SENDER_ID }}" >> .env
-          echo "FIREBASE_APP_ID=${{ secrets.FIREBASE_APP_ID }}" >> .env
-          echo "FIREBASE_MEASUREMENT_ID=${{ secrets.FIREBASE_MEASUREMENT_ID }}" >> .env
-
-      # Flutter設定とビルド
-      - name: Flutter Setup and Build
+      # Flutter設定とWebビルド
+      - name: Build Web
         run: |
           cd client
           flutter config --no-analytics
           flutter pub get
-          flutter build web --release
+          flutter build web
+          cd ..
 
       # Node.jsのセットアップ
-      - name: Set up Node.js
-        uses: actions/setup-node@v3
+      - uses: actions/setup-node@v3
         with:
           node-version: '18'
-          cache: 'npm'
 
       # Firebase CLIのインストール
       - name: Install Firebase CLI
         run: npm install -g firebase-tools
 
       # Google Cloud認証
-      - name: Authenticate to Google Cloud
-        uses: 'google-github-actions/auth@v2'
+      - uses: google-github-actions/auth@v2
         with:
           credentials_json: '${{ secrets.GCP_SA_KEY }}'
 
       # Google Cloud CLIのセットアップ
-      - name: Set up Cloud SDK
-        uses: 'google-github-actions/setup-gcloud@v2'
+      - uses: google-github-actions/setup-gcloud@v2
 
       # Cloud Functionsのデプロイ
       - name: Deploy Cloud Functions
+        if: github.ref == 'refs/heads/main'
         run: |
           cd functions
           npm ci
@@ -82,15 +57,18 @@ jobs:
 
       # Firebaseホスティングのデプロイ
       - name: Deploy to Firebase Hosting
+        if: github.ref == 'refs/heads/main'
         run: |
           firebase deploy --only hosting --token "${{ secrets.FIREBASE_TOKEN }}" --project ${{ secrets.GCP_PROJECT_ID }}
 
       # Firestore rulesのデプロイ
       - name: Deploy Firestore Rules
+        if: github.ref == 'refs/heads/main'
         run: |
           firebase deploy --only firestore --token "${{ secrets.FIREBASE_TOKEN }}" --project ${{ secrets.GCP_PROJECT_ID }}
 
       # Storage rulesのデプロイ
       - name: Deploy Storage Rules
+        if: github.ref == 'refs/heads/main'
         run: |
           firebase deploy --only storage --token "${{ secrets.FIREBASE_TOKEN }}" --project ${{ secrets.GCP_PROJECT_ID }}

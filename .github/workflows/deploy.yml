@@ -21,6 +21,7 @@ jobs:
       - run: flutter --version
 
       - name: Create .env file
+        working-directory: ./client
         run: |
           cat << EOF > .env
           FIREBASE_API_KEY=${{ secrets.FIREBASE_API_KEY }}

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:camera/camera.dart';
 import 'package:go_router/go_router.dart';
-import 'dart:js' as js;
+import 'package:flutter/foundation.dart' show kIsWeb;
 
 class CameraScreen extends ConsumerStatefulWidget {
   const CameraScreen({super.key});
@@ -25,15 +25,23 @@ class _CameraScreenState extends ConsumerState<CameraScreen> {
 
   Future<void> _initializeCamera() async {
     try {
-      // カメラを要求する前に、navigator.mediaDevices が利用可能か確認
-      final hasMediaDevices = js.context.hasProperty('navigator') &&
-          js.context['navigator'].hasProperty('mediaDevices');
-
-      if (!hasMediaDevices) {
-        setState(() {
-          _errorMessage = 'このブラウザではカメラを使用できません';
-        });
-        return;
+      // Webプラットフォームでの特別な処理
+      if (kIsWeb) {
+        // カメラの権限を確認
+        try {
+          final cameras = await availableCameras();
+          if (cameras.isEmpty) {
+            setState(() {
+              _errorMessage = 'カメラが見つかりません';
+            });
+            return;
+          }
+        } catch (e) {
+          setState(() {
+            _errorMessage = 'カメラへのアクセスが許可されていません。\nブラウザの設定でカメラへのアクセスを許可してください。';
+          });
+          return;
+        }
       }
 
       final cameras = await availableCameras();

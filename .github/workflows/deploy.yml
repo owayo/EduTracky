@@ -18,8 +18,9 @@ jobs:
       - name: Install Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.16.9'
+          flutter-version: '3.16.5'
           channel: 'stable'
+          cache: true
 
       # Flutterの依存関係をキャッシュ
       - name: Cache Flutter dependencies
@@ -42,13 +43,13 @@ jobs:
           echo "FIREBASE_APP_ID=${{ secrets.FIREBASE_APP_ID }}" >> .env
           echo "FIREBASE_MEASUREMENT_ID=${{ secrets.FIREBASE_MEASUREMENT_ID }}" >> .env
 
-      # Flutter Webのビルド
-      - name: Build Flutter Web
+      # Flutter設定とビルド
+      - name: Flutter Setup and Build
         run: |
           cd client
-          flutter pub get
           flutter config --no-analytics
-          flutter build web
+          flutter pub get
+          flutter build web --release
 
       # Node.jsのセットアップ
       - name: Set up Node.js

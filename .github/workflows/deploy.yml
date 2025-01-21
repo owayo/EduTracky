@@ -14,11 +14,11 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      # Flutterのインストール
+      # Flutterのインストール（Dart 3.2.6と互換性のあるバージョン）
       - name: Install Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.16.5'
+          flutter-version: '3.13.9'
           channel: 'stable'
           cache: true
 

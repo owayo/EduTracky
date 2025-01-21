@@ -18,13 +18,19 @@ jobs:
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.13.9'
+          flutter-version: '3.16.0'
           channel: 'stable'
+          cache: true
+
+      - name: Verify versions
+        run: |
+          dart --version
+          flutter --version
 
       - name: Build Flutter web app
         working-directory: ./client
         run: |
-          flutter --version
+          flutter config --no-analytics
           flutter pub get
           flutter build web
 

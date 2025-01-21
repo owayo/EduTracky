@@ -14,14 +14,23 @@ void main() {
       ),
     );
 
-    // AppBarのタイトルが表示されていることを確認
-    expect(find.text('ダッシュボード'), findsOneWidget);
+    // AppBarのタイトルが表示されることを確認
+    expect(find.text('EduTracky'), findsOneWidget);
 
-    // FloatingActionButtonが表示されていることを確認（テスト用紙撮影ボタン）
-    expect(find.byType(FloatingActionButton), findsOneWidget);
+    // メニューセクションのタイトルが表示されることを確認
+    expect(find.text('メニュー'), findsOneWidget);
+
+    // メニューカードが表示されることを確認
+    expect(find.text('テストを撮影'), findsOneWidget);
+    expect(find.text('学力を分析'), findsOneWidget);
+    expect(find.text('テスト履歴'), findsOneWidget);
+    expect(find.text('お子様管理'), findsOneWidget);
+
+    // 最近のテストセクションが表示されることを確認
+    expect(find.text('最近のテスト'), findsOneWidget);
   });
 
-  testWidgets('ダッシュボードの各セクションが表示されることをテスト', (WidgetTester tester) async {
+  testWidgets('今月のテスト平均が表示されることをテスト', (WidgetTester tester) async {
     // ダッシュボード画面をビルド
     await tester.pumpWidget(
       const ProviderScope(
@@ -31,10 +40,9 @@ void main() {
       ),
     );
 
-    // 学力推移グラフのセクションが表示されることを確認
-    expect(find.text('学力推移'), findsOneWidget);
-
-    // 最近のテスト結果セクションが表示されることを確認
-    expect(find.text('最近のテスト結果'), findsOneWidget);
+    // 今月のテスト平均のセクションが表示されることを確認
+    expect(find.text('今月のテスト平均'), findsOneWidget);
+    expect(find.text('83'), findsOneWidget);
+    expect(find.text('点'), findsOneWidget);
   });
 }

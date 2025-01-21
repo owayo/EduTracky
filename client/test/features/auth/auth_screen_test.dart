@@ -21,6 +21,6 @@ void main() {
     expect(find.widgetWithText(FilledButton, 'ログイン'), findsOneWidget);
 
     // Googleログインボタンが表示されていることを確認
-    expect(find.byIcon(Icons.login), findsOneWidget);
+    expect(find.widgetWithText(OutlinedButton, 'Googleでログイン'), findsOneWidget);
   });
 }

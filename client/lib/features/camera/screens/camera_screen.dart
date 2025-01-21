@@ -61,7 +61,7 @@ class _CameraScreenState extends ConsumerState<CameraScreen> {
         }
       } on CameraException catch (e) {
         String message = 'カメラの初期化に失敗しました';
-        if (e.description.contains('Permission denied')) {
+        if (e.description?.contains('Permission denied') ?? false) {
           message = 'カメラへのアクセスが許可されていません。\nブラウザの設定でカメラへのアクセスを許可してください。';
         }
         setState(() {

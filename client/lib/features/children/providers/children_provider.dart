@@ -61,7 +61,7 @@ class ChildrenNotifier extends AsyncNotifier<List<Child>> {
 
   Future<void> updateChild(Child child) async {
     final userId = FirebaseAuth.instance.currentUser?.uid;
-    if (userId == null) return;
+    if (userId == null || child.id == null) return;
 
     state = const AsyncValue.loading();
 
@@ -80,9 +80,9 @@ class ChildrenNotifier extends AsyncNotifier<List<Child>> {
     }
   }
 
-  Future<void> deleteChild(String childId) async {
+  Future<void> deleteChild(String? childId) async {
     final userId = FirebaseAuth.instance.currentUser?.uid;
-    if (userId == null) return;
+    if (userId == null || childId == null) return;
 
     state = const AsyncValue.loading();
 

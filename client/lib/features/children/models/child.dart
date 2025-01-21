@@ -1,19 +1,57 @@
-import 'package:freezed_annotation/freezed_annotation.dart';
-import 'package:flutter/foundation.dart';
+class Child {
+  final String? id;
+  final String name;
+  final DateTime birthDate;
+  final String? note;
+  final DateTime? createdAt;
+  final DateTime? updatedAt;
 
-part 'child.freezed.dart';
-part 'child.g.dart';
+  const Child({
+    this.id,
+    required this.name,
+    required this.birthDate,
+    this.note,
+    this.createdAt,
+    this.updatedAt,
+  });
 
-@freezed
-class Child with _$Child {
-  const factory Child({
-    required String id,
-    required String name,
-    required DateTime birthDate,  // 生年月日に変更
-    String? note,           // メモ（任意）
-    required DateTime createdAt,  // 登録日
-    required DateTime updatedAt,  // 更新日
-  }) = _Child;
+  Child copyWith({
+    String? id,
+    String? name,
+    DateTime? birthDate,
+    String? note,
+    DateTime? createdAt,
+    DateTime? updatedAt,
+  }) {
+    return Child(
+      id: id ?? this.id,
+      name: name ?? this.name,
+      birthDate: birthDate ?? this.birthDate,
+      note: note ?? this.note,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+    );
+  }
 
-  factory Child.fromJson(Map<String, dynamic> json) => _$ChildFromJson(json);
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'name': name,
+      'birthDate': birthDate.toIso8601String(),
+      'note': note,
+      'createdAt': createdAt?.toIso8601String(),
+      'updatedAt': updatedAt?.toIso8601String(),
+    };
+  }
+
+  factory Child.fromJson(Map<String, dynamic> json) {
+    return Child(
+      id: json['id'] as String?,
+      name: json['name'] as String,
+      birthDate: DateTime.parse(json['birthDate'] as String),
+      note: json['note'] as String?,
+      createdAt: json['createdAt'] != null ? DateTime.parse(json['createdAt'] as String) : null,
+      updatedAt: json['updatedAt'] != null ? DateTime.parse(json['updatedAt'] as String) : null,
+    );
+  }
 }
